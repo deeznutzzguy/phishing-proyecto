@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "framework": null,
+  "functions": {
+    "api/index.js": {
+      "handler": "api/index.js"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
