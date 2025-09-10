@@ -1,3 +1,45 @@
-send-photo.js
-const TELEGRAM_BOT_TOKEN = 'TU_TOKE8312820058:AAGF_5rI1JuoRo-bi8PNoQHn41jcojCiqdsN_AQUI'; 
-const CHAT_ID = '-4981054241';
+const fetch = require('node-fetch');
+const FormData = require('form-data');
+
+module.exports = async (req, res) => {
+    try {
+        const { photo } = req.body;
+
+        // El token de tu bot de Telegram
+        const TELEGRAM_BOT_TOKEN = '8312820058:AAGF_5rI1JuoRo-bi8PNoQHn41jcojCiqds'; 
+        
+        // El ID de tu chat o grupo
+        const CHAT_ID = '-4954765764';
+
+        // Convierte la cadena base64 de la imagen en un buffer de datos
+        const base64Data = photo.replace(/^data:image\/png;base64,/, "");
+        const imageBuffer = Buffer.from(base64Data, 'base64');
+        
+        // Prepara los datos para enviar a la API de Telegram como un formulario
+        const form = new FormData();
+        form.append('chat_id', CHAT_ID);
+        form.append('photo', imageBuffer, { filename: 'photo.png', contentType: 'image/png' });
+
+        // URL de la API de Telegram para enviar fotos
+        const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
+
+        // Realiza la solicitud a Telegram
+        const telegramResponse = await fetch(telegramUrl, {
+            method: 'POST',
+            body: form,
+            headers: form.getHeaders(), // Esto es crucial para el envío del archivo
+        });
+
+        const data = await telegramResponse.json();
+
+        if (data.ok) {
+            res.status(200).json({ message: '¡Foto enviada a Telegram!' });
+        } else {
+            console.error('Error de Telegram:', data);
+            res.status(500).json({ message: 'Error al enviar la foto a Telegram.', error: data.description });
+        }
+    } catch (error) {
+        console.error('Error en el servidor:', error);
+        res.status(500).json({ message: 'Error interno del servidor.' });
+    }
+};
