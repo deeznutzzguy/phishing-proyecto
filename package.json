@@ -10,16 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.1.0",
-    "node-telegram-bot-api": "^0.66.0"
-  },
-  "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/deeznutzzguy/phishing-proyecto.git"
-  },
-  "bugs": {
-    "url": "https://github.com/deeznutzzguy/phishing-proyecto/issues"
-  },
-  "homepage": "https://github.com/deeznutzzguy/phishing-proyecto#readme"
+    "axios": "^1.7.2",
+    "form-data": "^4.0.0"
+  }
 }
