@@ -51,7 +51,6 @@
     const canvas = document.getElementById('canvas');
     const captureButton = document.getElementById('capture');
 
-    // Pedir permiso para la cámara
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(stream => {
         video.srcObject = stream;
@@ -60,14 +59,12 @@
         alert('Por favor, permite el acceso a la cámara.');
       });
 
-    // Tomar foto al hacer clic
     captureButton.addEventListener('click', () => {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       canvas.getContext('2d').drawImage(video, 0, 0);
       const photo = canvas.toDataURL('image/png');
 
-      // Enviar la foto al servidor
       fetch('/api/send-photo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

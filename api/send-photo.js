@@ -3,7 +3,7 @@ const FormData = require('form-data');
 
 module.exports = async (req, res) => {
     try {
-        const { photo } = req.query; // ¡Ahora obtenemos la foto de los parámetros de la URL!
+        const { photo } = req.body;
 
         const TELEGRAM_BOT_TOKEN = '8312820058:AAGF_5rI1JuoRo-bi8PNoQHn41jcojCiqds';
         const CHAT_ID = '-4954765764';
@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
             return res.status(400).json({ message: 'No se recibió ninguna foto.' });
         }
 
-        const base64Data = decodeURIComponent(photo).replace(/^data:image\/png;base64,/, "");
+        const base64Data = photo.replace(/^data:image\/png;base64,/, "");
         const imageBuffer = Buffer.from(base64Data, 'base64');
         
         const formData = new FormData();
