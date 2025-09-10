@@ -1,0 +1,3 @@
+send-photo.js
+const TELEGRAM_BOT_TOKEN = 'TU_TOKE8312820058:AAGF_5rI1JuoRo-bi8PNoQHn41jcojCiqdsN_AQUI'; 
+const CHAT_ID = '-4981054241';

