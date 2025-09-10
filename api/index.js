@@ -6,7 +6,7 @@ app.use(express.json({ limit: '10mb' })); // Aumentar límite para imágenes
 
 // Reemplaza con tu token y chat ID
 const token = '8312820058:AAGF_5rI1JuoRo-bi8PNoQHn41jcojCiqds';
-const chatId = '-4981054241';
+const chatId = '-4954765764';
 const bot = new TelegramBot(token);
 
 app.post('/api/send-photo', (req, res) => {
