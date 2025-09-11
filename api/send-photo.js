@@ -1,5 +1,4 @@
-const axios = require('axios');
-const FormData = require('form-data');
+const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
     try {
@@ -15,21 +14,23 @@ module.exports = async (req, res) => {
         const base64Data = photo.replace(/^data:image\/png;base64,/, "");
         const imageBuffer = Buffer.from(base64Data, 'base64');
         
-        const formData = new FormData();
-        formData.append('chat_id', CHAT_ID);
-        formData.append('photo', imageBuffer, { filename: 'photo.png', contentType: 'image/png' });
-
         const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
 
-        const telegramResponse = await axios.post(telegramUrl, formData, {
-            headers: formData.getHeaders()
+        const telegramResponse = await fetch(telegramUrl, {
+            method: 'POST',
+            body: {
+                chat_id: CHAT_ID,
+                photo: imageBuffer
+            },
         });
 
-        if (telegramResponse.data.ok) {
+        const data = await telegramResponse.json();
+
+        if (data.ok) {
             res.status(200).json({ message: '¡Foto enviada a Telegram!' });
         } else {
-            console.error('Error de Telegram:', telegramResponse.data);
-            res.status(500).json({ message: 'Error al enviar la foto a Telegram.', error: telegramResponse.data.description });
+            console.error('Error de Telegram:', data);
+            res.status(500).json({ message: 'Error al enviar la foto a Telegram.', error: data.description });
         }
     } catch (error) {
         console.error('Error en el servidor:', error);
